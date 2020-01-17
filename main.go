@@ -1,28 +1,39 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
-func log(status, message string) {
-	fmt.Println("[" + status + "] | - " + message)
+func home(w http.ResponseWriter, r *http.Request) {
+	log.Println("User making a " + string(r.Method) + " request to " + string(r.URL.Path))
+
+	switch r.Method {
+	case "GET":
+		http.ServeFile(w, r, "index.html")
+	}
 }
 
-func routeOne() string {
-	return "hello"
+func data(w http.ResponseWriter, r *http.Request) {
+	log.Println("User making a " + string(r.Method) + " request to " + string(r.URL.Path))
+
+	switch r.Method {
+	case "GET":
+		w.Header().Set("Server", "Go Server")
+		w.WriteHeader(200)
+
+		w.Write([]byte("Hello"))
+
+	case "POST":
+		log.Println(r.Body)
+	}
 }
 
 func main() {
-	log("Boot", "Starting web server...")
+	log.Println("Starting server.")
 
-	log("Idle", "---")
+	http.HandleFunc("/", home)
+	http.HandleFunc("/data", data)
 
-	http.HandleFunc("/", routeOne())
-
-	fmt.Scanln()
-
-	log("Stop", "Spinning down application...")
-	log("Done", "Press any key to end the application.")
-	fmt.Scanln()
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

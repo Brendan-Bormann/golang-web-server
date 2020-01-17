@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Go Practice</title>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous">
+    </script>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <h1>Go site</h1>
+    <p>Hello, this is the offical site for my go server.</p>
+
+    <button id="get">GET /data</button><button id="post">POST /data</button>
+    <div>
+        <h3>Data from AJAX Call</h3>
+        <p id="data"></p>
+    </div>
+</body>
+</html>
+
+<script>
+
+    $("#get").on("click", () => {
+        $.ajax({
+            url: "/data",
+            data: null
+        }).then((data, err) => {
+            $('#data').empty();
+            $("#data").append(data);
+        });
+    });
+
+    $("#post").on("click", () => {
+        $.ajax({
+            url: "/data",
+            method: "POST",
+            data: "Some random data string from the html page."
+        }).then((data, err) => {
+            alert("Success!");
+        });
+    });
+
+</script>
+
+<style>
+
+body {
+    text-align: center;
+    font-family: 'Roboto', sans-serif;;
+}
+
+</style>
