@@ -1,15 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
 
 func log(status, message string) {
 	fmt.Println("[" + status + "] | - " + message)
 }
 
+func routeOne() string {
+	return "hello"
+}
+
 func main() {
 	log("Boot", "Starting web server...")
 
-	log("Idle", "...")
+	log("Idle", "---")
+
+	http.HandleFunc("/", routeOne())
 
 	fmt.Scanln()
 
