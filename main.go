@@ -3,30 +3,67 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 )
 
-func home(w http.ResponseWriter, r *http.Request) {
-	log.Println("User making a " + string(r.Method) + " request to " + string(r.URL.Path))
+func home(res http.ResponseWriter, req *http.Request) {
+	log.Println(string(req.Method) + " request to " + string(req.URL.Path))
 
-	switch r.Method {
+	switch req.Method {
 	case "GET":
-		http.ServeFile(w, r, "index.html")
+		http.ServeFile(res, req, "index.html")
 	}
 }
 
-func data(w http.ResponseWriter, r *http.Request) {
-	log.Println("User making a " + string(r.Method) + " request to " + string(r.URL.Path))
+func data(res http.ResponseWriter, req *http.Request) {
+	log.Println(string(req.Method) + " request to " + string(req.URL.Path))
 
-	switch r.Method {
+	switch req.Method {
 	case "GET":
-		w.Header().Set("Server", "Go Server")
-		w.WriteHeader(200)
+		res.Header().Set("Server", "Go Server")
+		res.WriteHeader(200)
 
-		w.Write([]byte("Hello"))
+		res.Write([]byte("Hello"))
 
 	case "POST":
-		log.Println(r.Body)
+		err := req.ParseForm()
+
+		if err != nil {
+			log.Panic(err)
+		}
+
+		data := req.Form
+		log.Println("POST Data: ", data)
 	}
+}
+
+func doWork(message chan string) {
+
+	message <- "Starting Job"
+
+	for i := 0; i < 5; i++ {
+		log.Printf("Work step %v", i+1)
+		time.Sleep(1 * time.Second)
+	}
+
+	message <- "Job's done."
+}
+
+func work(res http.ResponseWriter, req *http.Request) {
+	log.Println(string(req.Method) + " request to " + string(req.URL.Path))
+
+	res.Header().Set("Server", "Go Server")
+	res.WriteHeader(200)
+
+	message := make(chan string)
+
+	go doWork(message)
+
+	log.Println(<-message)
+
+	log.Println(<-message)
+
+	res.Write([]byte("Work Complete"))
 }
 
 func main() {
@@ -34,6 +71,7 @@ func main() {
 
 	http.HandleFunc("/", home)
 	http.HandleFunc("/data", data)
+	http.HandleFunc("/work", work)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

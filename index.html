@@ -37,14 +37,33 @@
         });
     });
 
+    var posting = false;
+
     $("#post").on("click", () => {
-        $.ajax({
-            url: "/data",
-            method: "POST",
-            data: "Some random data string from the html page."
-        }).then((data, err) => {
-            alert("Success!");
-        });
+        if (posting != true) {
+
+            posting = true;
+        
+            $.ajax({
+                url: "/data",
+                method: "POST",
+                data: {
+                    "name": "data packet",
+                    "number": "123",
+                    "value": "gold"
+                }
+            }).then((data) => {
+                posting = false;
+                alert("Posted data to /data");
+            }).catch((err) => {
+                posting = false;
+                alert("There was an error.");
+            })
+
+        }
+
+        
+        
     });
 
 </script>
